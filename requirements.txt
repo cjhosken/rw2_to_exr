@@ -1,5 +1,5 @@
 PySide6
 rawpy
 numpy
-OpenEXR
+pyexr
 pyinstaller

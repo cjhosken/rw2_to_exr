@@ -1,7 +1,7 @@
 import sys, os
 import rawpy
 from pathlib import Path
-import OpenEXR
+import pyexr
 import numpy as np
 
 from PySide6.QtWidgets import (QApplication, QLabel, QPushButton,
@@ -83,17 +83,11 @@ class ConversionThread(QThread):
                 )
             
             rgb_float = rgb.astype(np.float32) / 65535.0
-            header = OpenEXR.Header(rgb.shape[1], rgb.shape[0])
-            channels = {
-                'R': rgb_float[:,:,0].tobytes(),
-                'G': rgb_float[:,:,1].tobytes(),
-                'B': rgb_float[:,:,2].tobytes()
-            }
+            if rgb_float.dtype != np.float32:
+                rgb_float = rgb_float.astype(np.float32)
             
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            exr = OpenEXR.OutputFile(output_path, header)
-            exr.writePixels(channels)
-            exr.close()
+            pyexr.write(str(output_path), rgb_float)
             
         except Exception as e:
             raise Exception(f"Failed to convert {Path(input_path).name}: {str(e)}")
